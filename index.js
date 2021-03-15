@@ -238,12 +238,32 @@ function requestListener(request, response) {
 
         case "gen":
             if (path[1] == "sharex") {
-                if (request.method.toLowerCase() == "get") {
+                if (request.method.toLowerCase() == "get" && !u.query.auth) {
                     var json = JSON.stringify({
                         "Version": "13.4.0",
                         "DestinationType": "ImageUploader",
                         "RequestMethod": "POST",
                         "RequestURL": config.host + "/upload",
+                        "Body": "MultipartFormData",
+                        "FileFormName": "file",
+                        "URL": config.host + "/$json:id$",
+                        "DeletionURL": config.host + "/delete/$json:deleteKey$"
+                    });
+                    response.writeHead(201, {
+                        "Access-Control-Allow-Origin":"*",
+                        "Content-Type": "application/octet-stream",
+                        "Content-Disposition": "attachment; filename=sharex.sxcu"
+                    });
+                    response.end(json);
+                } else if (request.method.toLowerCase() == "get" && u.query.auth) {
+                    var json = JSON.stringify({
+                        "Version": "13.4.0",
+                        "DestinationType": "ImageUploader",
+                        "RequestMethod": "POST",
+                        "RequestURL": config.host + "/upload",
+                        "Headers": {
+                            "authentication": u.query.auth
+                        },
                         "Body": "MultipartFormData",
                         "FileFormName": "file",
                         "URL": config.host + "/$json:id$",
