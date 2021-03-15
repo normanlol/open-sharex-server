@@ -3,13 +3,14 @@ const http = require("http");
 const formidable = require("formidable");
 const cheerio = require("cheerio");
 const url = require("url");
-const port = process.env.PORT || 2000
 
 if (!fs.existsSync(__dirname + "/config.json")) {
     fs.copyFileSync(__dirname + "/config.example.json", __dirname + "/config.json");
 }
 
 const config = JSON.parse(fs.readFileSync(__dirname + "/config.json"));
+
+const port = process.env.PORT || config.port || 2000;
 
 http.createServer(requestListener).listen(port);
 console.log("-- open on port " + port + " --");
