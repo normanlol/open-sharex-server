@@ -98,7 +98,7 @@ function requestListener(request, response) {
                                 fs.writeFileSync(fn, fs.readFileSync(files.file.path));
                                 if (request.headers["authentication"]) {
                                     var md = JSON.stringify({
-                                        "uploader": whoIs(request.headers["authentication"]),
+                                        "uploader": escapeHtml(whoIs(request.headers["authentication"])),
                                         "uploaderKey": request.headers["authentication"],
                                         "uploadedAt": new Date() * 1,
                                         "deleteKey": dk
@@ -323,7 +323,7 @@ function requestListener(request, response) {
                                                 handleError(err, request, response);
                                             } else {
                                                 var $ = cheerio.load(resp);
-                                                var a = getAuth(fields.simpleName);
+                                                var a = getAuth(escapeHtml(fields.simpleName));
                                                 $(".name").text(config.serverName);
                                                 $(".code").attr("value", a);
                                                 $("#key").attr("value", a);
@@ -666,3 +666,13 @@ function handleError(error, request, response) {
         });
     }
 }
+
+
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+ }
