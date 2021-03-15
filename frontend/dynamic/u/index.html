@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Uploader | Image Server</title>
+        <link href="/css/style.css" rel="stylesheet">
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <div class="header">
+            <div class="leftSide">
+                <a href="/"><h2 class="name">Image Server</h2></a>
+            </div>
+            <div class="rightSide">
+                <a href="/"><button>home</button></a>
+                <a href="/u/"><button class="trans">upload</button></a>
+                <a href="/d/"><button>delete an upload</button></a>
+            </div>
+        </div>
+        <div class="body">
+            <noscript>This webpage requires Javascript because of how the API works, unfortunately.</noscript>
+            <div id="scriptReq" style="display:none;">
+                <p>You can also upload via <a href="/gen/sharex">ShareX</a> (<a href="https://getsharex.com">Download</a>)</p>
+                <label for="file">File</label>
+                <input type="file" name="file" id="file" autocomplete="off" accept=".png,.gif,.jpg"><br>
+                <label class="authContent" for="auth">Authorization code (<a href="/gen/auth">Don't have one?</a>)</label>
+                <input class="authContent" type="password" id="auth" placeholder="Put your auth code here."><br>
+                <button onclick="upload();">Upload</button>
+                <div id="progDiv">
+                    <p id="prog"></p>
+                </div>
+                <div style="display:none;" id="success">
+                    <img id="fileViewer"><br>
+                    <a id="link">Link</a> (<a id="htmlLink">HTML Viewer</a>) | <a id="delLink">Remove Image</a>
+                </div>
+                <div style="display:none;" id="failed">
+                    <p><i style="color:red;" id="err"></i></p>
+                </div>
+            </div>
+        </div>
+        <script src="/up/index.js"></script>
+    </body>
+</html>

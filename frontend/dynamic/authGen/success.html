@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Generate Auth | Image Server</title>
+        <link href="/css/style.css" rel="stylesheet">
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <div class="header">
+            <div class="leftSide">
+                <a href="/"><h2 class="name">Image Server</h2></a>
+            </div>
+            <div class="rightSide">
+                <a href="/"><button>home</button></a>
+                <a href="/u/"><button>upload</button></a>
+                <a href="/d/"><button>delete an upload</button></a>
+            </div>
+        </div>
+        <div class="body">
+            <p>Success! A key was generated. Do not share this key with anybody else!</p>
+            <input class="code" style="width:98%;" autocomplete="off" disabled onInput="this.value = document.getElementById('key').value;"><br>
+            <button id="copyBtn" style="display:none;" onclick="copy();">Copy Code</button>
+            <form action="/gen/sharex" method="POST">
+                <input id="key" name="auth" hidden="true">
+                <input type="submit" value="Get ShareX file">
+            </form>
+        </div>
+        <script>
+            document.getElementById("copyBtn").style.display = "";
+            function copy() {
+                var t = document.querySelector(".code");
+                t.removeAttribute("disabled");
+                t.select();
+                document.execCommand("copy");
+                t.setAttribute("disabled", "");
+            }
+        </script>
+    </body>
+</html>

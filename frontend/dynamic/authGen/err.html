@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Generate Auth | Image Server</title>
+        <link href="/css/style.css" rel="stylesheet">
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <div class="header">
+            <div class="leftSide">
+                <a href="/"><h2 class="name">Image Server</h2></a>
+            </div>
+            <div class="rightSide">
+                <a href="/"><button>home</button></a>
+                <a href="/u/"><button>upload</button></a>
+                <a href="/d/"><button>delete an upload</button></a>
+            </div>
+        </div>
+        <div class="body">
+            <p><i style="color:red;margin-bottom:1%;" class="err"></i></p>
+            <form method="POST" action="/gen/auth">
+                <label for="password">Password for the server (if you are the server owner, check the <i>config.json</i> file in the server's directory): </label>
+                <input name="password" type="password" placeholder="Server password." required><br>
+                <label for="simpleName">Your ID (this will be who you're known as on the uploads to the public):</label>
+                <input name="simpleName" placeholder="Make an ID." required><br>
+                <input type="submit" value="Create">
+            </form>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "open-sharex-server",
+  "version": "1.0.0",
+  "description": "open sourced image server, based on sharex",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/normanlol/open-sharex-server.git"
+  },
+  "keywords": [
+    "image",
+    "image-server"
+  ],
+  "author": "normanlol",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/normanlol/open-sharex-server/issues"
+  },
+  "homepage": "https://github.com/normanlol/open-sharex-server#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.5",
+    "formidable": "^1.2.2"
+  }
+}

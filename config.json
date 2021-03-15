@@ -1,0 +1,8 @@
+{
+    "maxSize": 100000,
+    "serverName": "images.foreskin.live",
+    "host": "http://localhost:2000",
+    "requireAuth": true,
+    "authGenPass": "P@ssw00rd!",
+    "port": 2000
+}
