@@ -106,3 +106,4 @@ dist
 # Private files 
 files/
 keys/
+config.json
