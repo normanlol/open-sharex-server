@@ -1,5 +1,5 @@
 {
-    "maxSize": 100000,
+    "maxSize": 10000000,
     "serverName": "Image Server",
     "host": "http://localhost:2000",
     "requireAuth": true,
