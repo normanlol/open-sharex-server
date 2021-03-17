@@ -521,7 +521,7 @@ function requestListener(request, response) {
             } else if (
                 whatType(u.pathname.substring(1).split(".")[0]) !== null
             ) {
-                fs.readFile(__dirname + "/files" + u.pathname + "." + u.pathname.substring(1).split(".")[0], function(err, resp) {
+                fs.readFile(__dirname + "/files" + u.pathname, function(err, resp) {
                     if (err) {
                         handleError(err, request, response);
                     } else {
@@ -533,6 +533,7 @@ function requestListener(request, response) {
                     }
                 });
             } else {
+                console.log(u.pathname.substring(1).split(".")[0])
                 handleError("404", request, response);
             }
         return;
