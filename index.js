@@ -505,7 +505,7 @@ function requestListener(request, response) {
                     }
                 })
             } else if (
-                whatType(u.pathname.substring(1)) !== null
+                whatType(path[1]) !== null
             ) {
                 fs.readFile(__dirname + "/files" + u.pathname + "." + whatType(u.pathname.substring(1)), function(err, resp) {
                     if (err) {
@@ -517,7 +517,21 @@ function requestListener(request, response) {
                         });
                         response.end(resp);
                     }
-                })
+                });
+            } else if (
+                whatType(path[1].split(".")[0]) !== null
+            ) {
+                fs.readFile(__dirname + "/files" + u.pathname + "." + whatType(path[1].split(".")[0]), function(err, resp) {
+                    if (err) {
+                        handleError(err, request, response);
+                    } else {
+                        response.writeHead(200, {
+                            "Access-Control-Allow-Origin": "*",
+                            "Content-Type": "image/" + whatType(u.pathname.substring(1))
+                        });
+                        response.end(resp);
+                    }
+                });
             } else {
                 handleError("404", request, response);
             }
