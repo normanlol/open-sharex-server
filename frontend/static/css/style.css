@@ -127,6 +127,10 @@ code, .code {
     color:#b8c1ec;
 }
 
+#success img, .imgContainer img {
+    max-width:100%;
+}
+
 @media (min-width:800px) {
     .thumbContainer a {
         margin:5px;
