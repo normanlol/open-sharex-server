@@ -1,4 +1,7 @@
 document.getElementById("scriptReq").style.display = "";
+if (localStorage.getItem("auth") && document.getElementById("auth")) {
+    document.getElementById("auth").value = localStorage.getItem("auth");
+}
 
 function upload() {
     document.getElementById("success").style.display = "none";
@@ -24,6 +27,7 @@ function upload() {
             document.getElementById("link").href = "/" + j.id;
             document.getElementById("htmlLink").href = "/view/" + j.id
             document.getElementById("delLink").href = "/d/?code=" + j.deleteKey;
+            if (document.getElementById("auth")) {localStorage.setItem("auth", document.getElementById("auth").value);}
         } else {
             document.getElementById("progDiv").style.display = "none";
             document.getElementById("failed").style.display = "";

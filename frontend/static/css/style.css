@@ -131,6 +131,11 @@ code, .code {
     max-width:100%;
 }
 
+#auth {
+    max-width:550px;
+    width:50%;
+}
+
 @media (min-width:800px) {
     .thumbContainer a {
         margin:5px;
