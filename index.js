@@ -437,13 +437,13 @@ function requestListener(request, response) {
                 })
             } else {
                 if (whatType(path[1]) !== null) {
-                    jimp.read(__dirname + "/files/" + path[1] + "." + whatType(path[1]), function(err, img) {
+                    jimp.read(__dirname + "/files/" + path[1] + "." + whatType(path[1]), async function(err, img) {
                         if (err) {
                             handleError(err, request, response);
                         } else {
                             img.resize(256, jimp.AUTO);
                             img.quality(50);
-                            img.write(__dirname + "/files/thumbs/" + path[1] + ".jpg");
+                            await img.writeAsync(__dirname + "/files/thumbs/" + path[1] + ".jpg");
                             fs.readFile(__dirname + "/files/thumbs/" + path[1] + ".jpg" , function(err, resp) {
                                 if (err) {
                                     handleError(err, request, response);
