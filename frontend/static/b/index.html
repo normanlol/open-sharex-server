@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Browse | $serverName</title>
+        <link href="/css/style.css" rel="stylesheet">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=devide-width, inital-scale=1.0">
+        <meta name="description" content="An open-sharex-server instance.">
+    </head>
+    <body>
+        <div class="header">
+            <div class="leftSide">
+                <a href="/"><h2 class="name">Image Server</h2></a>
+            </div>
+            <div class="rightSide">
+                <a href="/"><button>home</button></a>
+                <a href="/u/"><button>upload</button></a>
+                <a href="/d/"><button>delete an upload</button></a>
+                <a href="/b/"><button class="trans">browse</button></a>
+            </div>
+        </div>
+        <div class="body">
+            <noscript><i>This page requires Javascript.</i></noscript>
+            <div id="reqScript">
+                <div id="loader">
+                    <div class="lds">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <p><i>Getting all images on the server...</i></p>
+                </div>
+                <div id="container" class="thumbContainer" style="display:none;"></div>
+            </div>
+        </div>
+    </body>
+    <script src="/b/index.js"></script>
+</html>

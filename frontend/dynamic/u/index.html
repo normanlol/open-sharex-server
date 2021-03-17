@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Uploader | Image Server</title>
+        <title>Uploader | $serverName</title>
         <link href="/css/style.css" rel="stylesheet">
         <meta charset="UTF-8">
     </head>
@@ -14,6 +14,7 @@
                 <a href="/"><button>home</button></a>
                 <a href="/u/"><button class="trans">upload</button></a>
                 <a href="/d/"><button>delete an upload</button></a>
+                <a href="/b/"><button>browse</button></a>
             </div>
         </div>
         <div class="body">
@@ -25,7 +26,12 @@
                 <label class="authContent" for="auth">Authorization code (<a href="/gen/auth">Don't have one?</a>)</label>
                 <input class="authContent" type="password" id="auth" placeholder="Put your auth code here."><br>
                 <button onclick="upload();">Upload</button>
-                <div id="progDiv">
+                <div id="progDiv" style="display:none;">
+                    <div class="lds">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
                     <p id="prog"></p>
                 </div>
                 <div style="display:none;" id="success">

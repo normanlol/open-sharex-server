@@ -3,6 +3,7 @@ const http = require("http");
 const formidable = require("formidable");
 const cheerio = require("cheerio");
 const url = require("url");
+const jimp = require("jimp");
 
 if (!fs.existsSync(__dirname + "/config.json")) {
     fs.copyFileSync(__dirname + "/config.example.json", __dirname + "/config.json");
@@ -22,7 +23,7 @@ function requestListener(request, response) {
         case "upload":
             if (request.method.toLowerCase() == "post") {
                 var f = formidable();
-                f.parse(request, function(err, fields, files) {
+                f.parse(request, async function(err, fields, files) {
                     if (err) {
                         handleError(err, request, response)
                     } else {
@@ -407,6 +408,61 @@ function requestListener(request, response) {
             }
         return;
 
+        case "browse":
+            var f = fs.readdirSync(__dirname + "/files/");
+            var rf = [];
+            for (var c in f) {
+                if (f[c] == "meta") {continue;} else if (f[c] == "thumbs") {continue;} else {rf.push(f[c].split(".")[0]);}
+            }
+            response.writeHead(200, {
+                "Access-Control-Allow-Origin": "*",
+                "Content-Type": "application/json"
+            });
+            response.end(JSON.stringify(rf));
+        return;
+
+        case "thumb":
+            if (!fs.existsSync(__dirname + "/files/thumbs/")) {fs.mkdirSync(__dirname + "/files/thumbs");}
+            if (fs.existsSync(__dirname + "/files/thumbs/" + path[1] + ".jpg")) {
+                fs.readFile(__dirname + "/files/thumbs/" + path[1] + ".jpg", function(err, resp) {
+                    if (err) {
+                        handleError(err, request, response);
+                    } else {
+                        response.writeHead(200, {
+                            "Access-Control-Allow-Origin": "*",
+                            "Content-Type": "image/jpg"
+                        });
+                        response.end(resp);
+                    }
+                })
+            } else {
+                if (whatType(path[1]) !== null) {
+                    jimp.read(__dirname + "/files/" + path[1] + "." + whatType(path[1]), function(err, img) {
+                        if (err) {
+                            handleError(err, request, response);
+                        } else {
+                            img.resize(256, jimp.AUTO);
+                            img.quality(50);
+                            img.write(__dirname + "/files/thumbs/" + path[1] + ".jpg");
+                            fs.readFile(__dirname + "/files/thumbs/" + path[1] + ".jpg" , function(err, resp) {
+                                if (err) {
+                                    handleError(err, request, response);
+                                } else {
+                                    response.writeHead(201, {
+                                        "Access-Control-Allow-Origin": "*",
+                                        "Content-Type": "image/jpg"
+                                    });
+                                    response.end(resp);
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    handleError("404", request, response);
+                }
+            }
+        return;
+
         default:
             if (fs.existsSync(__dirname + "/frontend/static" + u.pathname + "index.html")) {
                 fs.readFile(__dirname + "/frontend/static" + u.pathname + "index.html", function(err, resp) {
@@ -415,6 +471,8 @@ function requestListener(request, response) {
                     } else {
                         var $ = cheerio.load(resp);
                         $(".name").text(config.serverName);
+                        var nt = $("title").text().split("$serverName").join(config.serverName);
+                        $("title").text(nt);
                         response.writeHead(200, {
                             "Access-Control-Allow-Origin": "*",
                             "Content-Type": "text/html"
@@ -427,11 +485,23 @@ function requestListener(request, response) {
                     if (err) {
                         handleError(err, request, response);
                     } else {
-                        response.writeHead(200, {
-                            "Access-Control-Allow-Origin": "*",
-                            "Content-Type": getMime(u.pathname)
-                        });
-                        response.end(resp);
+                        if (getMime(u.pathname) == "text/html") {
+                            var $ = cheerio.load(resp);
+                            $(".name").text(config.serverName);
+                            var nt = $("title").text().split("$serverName").join(config.serverName);
+                            $("title").text(nt);
+                            response.writeHead(200, {
+                                "Access-Control-Allow-Origin": "*",
+                                "Content-Type": "text/html"
+                            });
+                            response.end($.html());
+                        } else {
+                            response.writeHead(200, {
+                                "Access-Control-Allow-Origin": "*",
+                                "Content-Type": getMime(u.pathname)
+                            });
+                            response.end(resp);
+                        }
                     }
                 })
             } else if (
