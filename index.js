@@ -162,6 +162,8 @@ function requestListener(request, response) {
                     var $ = cheerio.load(resp);
                     if (config.requireAuth == false) {$(".authCode").remove();}
                     $(".name").text(config.serverName);
+                    var nt = $("title").text().toString().replace("$serverName", config.serverName);;
+                    $("title").text(nt);
                     response.writeHead(200, {
                         "Access-Control-Allow-Origin": "*",
                         "Content-Type": "text/html"
@@ -225,6 +227,8 @@ function requestListener(request, response) {
                         if (j.uploadedAt == null) {$("#dateContainer").remove();} else {$("#date").text(new Date(j.uploadedAt).toString());}
                         $(".name").text(config.serverName);
                         $("img").attr("src", "/" + path[1]);
+                        var nt = $("title").text().toString().replace("$serverName", config.serverName);
+                        $("title").text(nt);
                         response.writeHead(200, {
                             "Access-Control-Allow-Origin": "*",
                             "Content-Type": "text/html"
@@ -326,6 +330,8 @@ function requestListener(request, response) {
                                                 var $ = cheerio.load(resp);
                                                 var a = getAuth(escapeHtml(fields.simpleName));
                                                 $(".name").text(config.serverName);
+                                                var nt = $("title").text().toString().replace("$serverName", config.serverName);
+                                                $("title").text(nt);
                                                 $(".code").attr("value", a);
                                                 $("#key").attr("value", a);
                                                 response.writeHead(201, {
@@ -343,6 +349,8 @@ function requestListener(request, response) {
                                                 var $ = cheerio.load(resp);
                                                 $("i").text("Invalid password.");
                                                 $(".name").text(config.serverName);
+                                                var nt = $("title").text().toString().replace("$serverName", config.serverName);
+                                                $("title").text(nt);
                                                 response.writeHead(400, {
                                                     "Access-Control-Allow-Origin": "*",
                                                     "Content-Type": "text/html"
@@ -358,6 +366,8 @@ function requestListener(request, response) {
                                                 var $ = cheerio.load(resp);
                                                 $("i").text("That name is already taken.");
                                                 $(".name").text(config.serverName);
+                                                var nt = $("title").text().toString().replace("$serverName", config.serverName);
+                                                $("title").text(nt);
                                                 response.writeHead(400, {
                                                     "Access-Control-Allow-Origin": "*",
                                                     "Content-Type": "text/html"
@@ -374,6 +384,8 @@ function requestListener(request, response) {
                                             var $ = cheerio.load(resp);
                                             $("i").text("Both fields are required.");
                                             $(".name").text(config.serverName);
+                                            var nt = $("title").text().toString().replace("$serverName", config.serverName);
+                                            $("title").text(nt);
                                             response.writeHead(400, {
                                                 "Access-Control-Allow-Origin": "*",
                                                 "Content-Type": "text/html"
@@ -391,6 +403,8 @@ function requestListener(request, response) {
                             } else {
                                 var $ = cheerio.load(resp);
                                 $(".name").text(config.serverName);
+                                var nt = $("title").text().toString().replace("$serverName", config.serverName);
+                                $("title").text(nt);
                                 response.writeHead(200, {
                                     "Access-Control-Allow-Origin": "*",
                                     "Content-Type": "text/html"
@@ -471,7 +485,7 @@ function requestListener(request, response) {
                     } else {
                         var $ = cheerio.load(resp);
                         $(".name").text(config.serverName);
-                        var nt = $("title").text().replace("$serverName", config.serverName)
+                        var nt = $("title").text().toString().replace("$serverName", config.serverName);
                         $("title").text(nt);
                         response.writeHead(200, {
                             "Access-Control-Allow-Origin": "*",
@@ -488,7 +502,7 @@ function requestListener(request, response) {
                         if (getMime(u.pathname) == "text/html") {
                             var $ = cheerio.load(resp);
                             $(".name").text(config.serverName);
-                            var nt = $("title").text().replace("$serverName", config.serverName);
+                            var nt = $("title").text().toString().replace("$serverName", config.serverName);
                             $("title").text(nt);
                             response.writeHead(200, {
                                 "Access-Control-Allow-Origin": "*",
@@ -533,7 +547,6 @@ function requestListener(request, response) {
                     }
                 });
             } else {
-                console.log(u.pathname.substring(1).split(".")[0])
                 handleError("404", request, response);
             }
         return;
@@ -722,7 +735,7 @@ function handleError(error, request, response) {
                     var $ = cheerio.load(resp);
                     $("#err").text(error.stack || error.message || error.code || err);
                     $(".name").text(config.serverName);
-                    var nt = $("title").text().replace("$serverName", config.serverName);
+                    var nt = $("title").text().toString().replace("$serverName", config.serverName);
                     $("title").text(nt);
                     response.writeHead(404, {
                         "Access-Control-Allow-Origin" : "*",
@@ -745,7 +758,7 @@ function handleError(error, request, response) {
                 var $ = cheerio.load(resp);
                 $("#err").text(error.stack || error.message || error.code || err);
                 $(".name").text(config.serverName);
-                var nt = $("title").text().replace("$serverName", config.serverName);
+                var nt = $("title").text().toString().replace("$serverName", config.serverName);
                 $("title").text(nt);
                 response.writeHead(404, {
                     "Access-Control-Allow-Origin" : "*",
