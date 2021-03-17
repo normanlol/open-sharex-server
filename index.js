@@ -471,7 +471,7 @@ function requestListener(request, response) {
                     } else {
                         var $ = cheerio.load(resp);
                         $(".name").text(config.serverName);
-                        var nt = $("title").text().split("$serverName").join(config.serverName);
+                        var nt = $("title").text().replace("$serverName", config.serverName)
                         $("title").text(nt);
                         response.writeHead(200, {
                             "Access-Control-Allow-Origin": "*",
@@ -488,7 +488,7 @@ function requestListener(request, response) {
                         if (getMime(u.pathname) == "text/html") {
                             var $ = cheerio.load(resp);
                             $(".name").text(config.serverName);
-                            var nt = $("title").text().split("$serverName").join(config.serverName);
+                            var nt = $("title").text().replace("$serverName", config.serverName);
                             $("title").text(nt);
                             response.writeHead(200, {
                                 "Access-Control-Allow-Origin": "*",
@@ -720,7 +720,10 @@ function handleError(error, request, response) {
                     response.end(s);
                 } else {
                     var $ = cheerio.load(resp);
+                    $("#err").text(error.stack || error.message || error.code || err);
                     $(".name").text(config.serverName);
+                    var nt = $("title").text().replace("$serverName", config.serverName);
+                    $("title").text(nt);
                     response.writeHead(404, {
                         "Access-Control-Allow-Origin" : "*",
                         "Content-Type": "text/html"
@@ -742,6 +745,8 @@ function handleError(error, request, response) {
                 var $ = cheerio.load(resp);
                 $("#err").text(error.stack || error.message || error.code || err);
                 $(".name").text(config.serverName);
+                var nt = $("title").text().replace("$serverName", config.serverName);
+                $("title").text(nt);
                 response.writeHead(404, {
                     "Access-Control-Allow-Origin" : "*",
                     "Content-Type": "text/html"
