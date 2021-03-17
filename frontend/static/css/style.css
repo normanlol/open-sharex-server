@@ -127,25 +127,50 @@ code, .code {
     color:#b8c1ec;
 }
 
-.thumbContainer a {
-    margin:5px;
-    background:#070911;
-    border-radius:4px;
-    height:250px;
-    width:calc(calc(100vw - 106px) / 5);
-    display:block;
-    float:left;
+@media (min-width:800px) {
+    .thumbContainer a {
+        margin:5px;
+        background:#070911;
+        border-radius:4px;
+        height:250px;
+        width:calc(calc(100vw - 106px) / 5);
+        display:block;
+        float:left;
+    }
+
+    .thumbContainer img {
+        border-radius:8px;
+        width:calc(calc(100vw - 345px) / 5);
+        height:200px;
+        object-fit:cover;
+        margin-top:25px;
+        margin-left:25px;
+        text-align:center;
+        transition:border-radius 0.5s;
+    }
 }
 
-.thumbContainer img {
-    border-radius:8px;
-    width:calc(calc(100vw - 345px) / 5);
-    height:200px;
-    object-fit:cover;
-    margin-top:25px;
-    margin-left:25px;
-    text-align:center;
-    transition:border-radius 0.5s;
+@media (max-width:800px) {
+    .thumbContainer a {
+        margin:5px;
+        background:#070911;
+        border-radius:4px;
+        height:250px;
+        width:98%;
+        display:block;
+        float:left;
+    }
+
+    .thumbContainer img {
+        border-radius:8px;
+        width:90%;
+        height:200px;
+        object-fit:cover;
+        margin-top:25px;
+        margin-left:25px;
+        text-align:center;
+        transition:border-radius 0.5s;
+    }
 }
 
 .thumbContainer img:hover {
