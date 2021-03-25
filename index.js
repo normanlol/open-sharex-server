@@ -216,29 +216,75 @@ function requestListener(request, response) {
         return;
 
         case "view":
-            if (whatType(path[1]) !== null) {
-                fs.readFile(__dirname + "/frontend/dynamic/view/index.html", function(err, resp) {
-                    if (err) {
-                        handleError(err, request, response);
-                    } else {
-                        var $ = cheerio.load(resp);
-                        var j = JSON.parse(fs.readFileSync(__dirname + "/files/meta/" + path[1] + ".json"));
-                        if (j.uploader == null) {$("#upContainer").remove();} else {$("#uploader").text(j.uploader)}
-                        if (j.uploadedAt == null) {$("#dateContainer").remove();} else {$("#date").text(new Date(j.uploadedAt).toString());}
-                        $(".name").text(config.serverName);
-                        $("img").attr("src", "/" + path[1]);
-                        var nt = $("title").text().toString().replace("$serverName", config.serverName);
-                        $("title").text(nt);
-                        response.writeHead(200, {
-                            "Access-Control-Allow-Origin": "*",
-                            "Content-Type": "text/html"
-                        });
-                        response.end($.html());
-                    }
-                })
+            if (returnRaw(request.headers["user-agent"]) || request.headers.accept.startsWith("image/")) {
+                if (
+                    whatType(u.pathname.substring(1)) !== null
+                ) {
+                    fs.readFile(__dirname + "/files" + u.pathname + "." + whatType(u.pathname.substring(1)), function(err, resp) {
+                        if (err) {
+                            handleError(err, request, response);
+                        } else {
+                            response.writeHead(200, {
+                                "Access-Control-Allow-Origin": "*",
+                                "Content-Type": "image/" + whatType(u.pathname.substring(1))
+                            });
+                            response.end(resp);
+                        }
+                    })
+                } else if (
+                    whatType(u.pathname.substring(1).split(".")[0]) !== null
+                ) {
+                    fs.readFile(__dirname + "/files" + u.pathname, function(err, resp) {
+                        if (err) {
+                            handleError(err, request, response);
+                        } else {
+                            response.writeHead(200, {
+                                "Access-Control-Allow-Origin": "*",
+                                "Content-Type": "image/" + whatType(u.pathname.substring(1))
+                            });
+                            response.end(resp);
+                        }
+                    });
+                } 
             } else {
-                handleError("404", request, response);
+                if (whatType(path[1]) !== null) {
+                    fs.readFile(__dirname + "/frontend/dynamic/view/index.html", function(err, resp) {
+                        if (err) {
+                            handleError(err, request, response);
+                        } else {
+                            var $ = cheerio.load(resp);
+                            var j = JSON.parse(fs.readFileSync(__dirname + "/files/meta/" + path[1] + ".json"));
+                            if (j.uploader == null) {
+                                $("#upContainer").remove();
+                                $("#ogTitle").attr("content", "Image uploaded by Anonymous");
+                            } else {
+                                $("#uploader").text(j.uploader);
+                                $("#ogTitle").attr("content", "Image uploaded by " + j.uploader);
+                            }
+                            if (j.uploadedAt == null) {
+                                $("#dateContainer").remove();
+                                $("#ogDesc").attr("content", "Uploaded at an unknown time");
+                            } else {
+                                $("#date").text(new Date(j.uploadedAt).toString());
+                                $("#ogDesc").attr("content", "Uploaded at " + new Date(j.uploadedAt).toString());
+                            }
+                            $("#ogIUrl").attr("content", config.host + "/" + path[1])
+                            $(".name").text(config.serverName);
+                            $("img").attr("src", "/" + path[1]);
+                            var nt = $("title").text().toString().replace("$serverName", config.serverName);
+                            $("title").text(nt);
+                            response.writeHead(200, {
+                                "Access-Control-Allow-Origin": "*",
+                                "Content-Type": "text/html"
+                            });
+                            response.end($.html());
+                        }
+                    })
+                } else {
+                    handleError("404", request, response);
+                }
             }
+            
         return;
 
         case "gen":
@@ -461,7 +507,7 @@ function requestListener(request, response) {
                             handleError(err, request, response);
                         } else {
                             img.resize(256, jimp.AUTO);
-                            img.quality(50);
+                            img.quality(75);
                             await img.writeAsync(__dirname + "/files/thumbs/" + path[1] + ".jpg");
                             fs.readFile(__dirname + "/files/thumbs/" + path[1] + ".jpg" , function(err, resp) {
                                 if (err) {
@@ -775,6 +821,13 @@ function handleError(error, request, response) {
     }
 }
 
+function returnRaw(ua) {
+    if (ua.includes("Discord") || ua.includes("Googlebot") || ua.includes("Discord") || ua.includes("BingPreviews")) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 function escapeHtml(unsafe) {
     return unsafe
