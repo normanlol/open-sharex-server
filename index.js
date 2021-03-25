@@ -424,6 +424,11 @@ function requestListener(request, response) {
 
         case "browse":
             var f = fs.readdirSync(__dirname + "/files/");
+            f.sort(function(a, b) {
+                return fs.statSync(__dirname + "/files/" + a).birthtime.getTime() - 
+                fs.statSync(__dirname + "/files/" + b).birthtime.getTime();
+            });
+            f.reverse();
             var rf = [];
             for (var c in f) {
                 if (f[c] == "meta") {continue;} else if (f[c] == "thumbs") {continue;} else {rf.push(f[c].split(".")[0]);}
