@@ -142,7 +142,7 @@ code, .code {
         background:#070911;
         border-radius:4px;
         height:250px;
-        width:calc(calc(100vw - 106px) / 5);
+        width:calc(calc(98vw / 5) - 14px);
         display:block;
         float:left;
     }
@@ -165,7 +165,7 @@ code, .code {
         background:#070911;
         border-radius:4px;
         height:250px;
-        width:98%;
+        width:calc(98vw - 14px);
         display:block;
         float:left;
     }
