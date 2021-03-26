@@ -244,21 +244,20 @@ function requestListener(request, response) {
                             var j = JSON.parse(fs.readFileSync(__dirname + "/files/meta/" + path[1] + ".json"));
                             if (j.uploader == null) {
                                 $("#upContainer").remove();
-                                $("#ogTitle").attr("content", "Image uploaded by Anonymous");
+                                $(".ogTitle").attr("content", "Image uploaded by Anonymous");
                             } else {
                                 $("#uploader").text(j.uploader);
-                                $("#ogTitle").attr("content", "Image uploaded by " + j.uploader);
+                                $(".ogTitle").attr("content", "Image uploaded by " + j.uploader);
                             }
                             if (j.uploadedAt == null) {
                                 $("#dateContainer").remove();
-                                $("#ogDesc").attr("content", "Uploaded at an unknown time");
+                                $(".ogDesc").attr("content", "Uploaded at an unknown time");
                             } else {
                                 $("#date").text(new Date(j.uploadedAt).toString());
-                                $("#ogDesc").attr("content", "Uploaded at " + new Date(j.uploadedAt).toString());
+                                $(".ogDesc").attr("content", "Uploaded at " + new Date(j.uploadedAt).toString());
                             }
-                            $("#ogIUrl").attr("content", config.host + "/" + path[1]);
-                            $("#ogIRaw").attr("content", config.host + "/" + path[1]);
-                            $("#ogUrl").attr("content", config.host + "/view/" + path[1]);
+                            $(".ogIUrl").attr("content", config.host + "/" + path[1]);
+                            $(".ogUrl").attr("content", config.host + "/view/" + path[1]);
                             if (!j.width || !j.height) {
                                 Jimp.read(__dirname + "/files/" + path[1] + "." + whatType(path[1])).then(function(f) {
                                     var w = f.bitmap.width;
@@ -266,8 +265,8 @@ function requestListener(request, response) {
                                     j.width = w;
                                     j.height = h;
                                     fs.writeFileSync(__dirname + "/files/meta/" + path[1] + ".json", JSON.stringify(j));
-                                    $("#ogWidth").attr("content", w);
-                                    $("#ogHeight").attr("content", h);
+                                    $(".ogWidth").attr("content", w);
+                                    $(".ogHeight").attr("content", h);
                                     $(".name").text(config.serverName);
                                     $("img").attr("src", "/" + path[1]);
                                     var nt = $("title").text().toString().replace("$serverName", config.serverName);
@@ -279,8 +278,8 @@ function requestListener(request, response) {
                                     response.end($.html());
                                 }).catch(function(err) {
                                     console.log(err);
-                                    $("#ogWidth").remove();
-                                    $("#ogHeight").remove();
+                                    $(".ogWidth").remove();
+                                    $(".ogHeight").remove();
                                     $(".name").text(config.serverName);
                                     $("img").attr("src", "/" + path[1]);
                                     var nt = $("title").text().toString().replace("$serverName", config.serverName);
@@ -292,8 +291,8 @@ function requestListener(request, response) {
                                     response.end($.html());
                                 });
                             } else {
-                                $("#ogWidth").attr("content", j.width);
-                                $("#ogHeight").attr("content", j.height);
+                                $(".ogWidth").attr("content", j.width);
+                                $(".ogHeight").attr("content", j.height);
                                 $(".name").text(config.serverName);
                                 $("img").attr("src", "/" + path[1]);
                                 var nt = $("title").text().toString().replace("$serverName", config.serverName);
