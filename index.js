@@ -288,6 +288,7 @@ function requestListener(request, response) {
                                 $("#ogDesc").attr("content", "Uploaded at " + new Date(j.uploadedAt).toString());
                             }
                             $("#ogIUrl").attr("content", config.host + "/" + path[1]);
+                            $("#ogIRaw").attr("content", config.host + "/" + path[1]);
                             $("#ogUrl").attr("content", config.host + "/view/" + path[1]);
                             if (!j.width || !j.height) {
                                 Jimp.read(__dirname + "/files/" + path[1] + "." + whatType(path[1])).then(function(f) {
