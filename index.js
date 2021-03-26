@@ -268,7 +268,8 @@ function requestListener(request, response) {
                                 $("#date").text(new Date(j.uploadedAt).toString());
                                 $("#ogDesc").attr("content", "Uploaded at " + new Date(j.uploadedAt).toString());
                             }
-                            $("#ogIUrl").attr("content", config.host + "/" + path[1])
+                            $("#ogIUrl").attr("content", config.host + "/" + path[1]);
+                            $("#ogUrl").attr("content", config.host + "/view/" + path[1]);
                             $(".name").text(config.serverName);
                             $("img").attr("src", "/" + path[1]);
                             var nt = $("title").text().toString().replace("$serverName", config.serverName);
