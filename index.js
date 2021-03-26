@@ -4,6 +4,7 @@ const formidable = require("formidable");
 const cheerio = require("cheerio");
 const url = require("url");
 const jimp = require("jimp");
+const Jimp = require("jimp");
 
 if (!fs.existsSync(__dirname + "/config.json")) {
     fs.copyFileSync(__dirname + "/config.example.json", __dirname + "/config.json");
@@ -97,32 +98,50 @@ function requestListener(request, response) {
                                 if (!fs.existsSync(__dirname + "/files/")) {fs.mkdirSync(__dirname + "/files/")}
                                 if (!fs.existsSync(__dirname + "/files/meta/")) {fs.mkdirSync(__dirname + "/files/meta/")}
                                 fs.writeFileSync(fn, fs.readFileSync(files.file.path));
-                                if (request.headers["authentication"]) {
-                                    var md = JSON.stringify({
-                                        "uploader": escapeHtml(whoIs(request.headers["authentication"])),
-                                        "uploaderKey": request.headers["authentication"],
-                                        "uploadedAt": new Date() * 1,
+                                jimp.read(fn).then(function(f) {
+                                    var h = f.bitmap.height;
+                                    var w = f.bitmap.width;
+                                    if (request.headers["authentication"]) {
+                                        var md = JSON.stringify({
+                                            "uploader": escapeHtml(whoIs(request.headers["authentication"])),
+                                            "uploaderKey": request.headers["authentication"],
+                                            "uploadedAt": new Date() * 1,
+                                            "deleteKey": dk,
+                                            "width": w,
+                                            "height": h
+                                        });
+                                    } else {
+                                        var md = JSON.stringify({
+                                            "uploader": "Anonymous",
+                                            "uploaderKey": null,
+                                            "uploadedAt": new Date() * 1,
+                                            "deleteKey": dk,
+                                            "width": w,
+                                            "height": h
+                                        });
+                                    }
+                                    fs.writeFileSync(mdfn, md);
+                                    var res = JSON.stringify({
+                                        "success": true,
+                                        "id": id,
                                         "deleteKey": dk
                                     });
-                                } else {
-                                    var md = JSON.stringify({
-                                        "uploader": "Anonymous",
-                                        "uploaderKey": null,
-                                        "uploadedAt": new Date() * 1,
-                                        "deleteKey": dk
+                                    response.writeHead(201, {
+                                        "Access-Control-Allow-Origin": "*",
+                                        "Content-Type": "application/json"
                                     });
-                                }
-                                fs.writeFileSync(mdfn, md);
-                                var res = JSON.stringify({
-                                    "success": true,
-                                    "id": id,
-                                    "deleteKey": dk
+                                    response.end(res);
+                                }).catch(function(err) {
+                                    var res = JSON.stringify({
+                                        "success": false,
+                                        "err": err
+                                    });
+                                    response.writeHead(201, {
+                                        "Access-Control-Allow-Origin": "*",
+                                        "Content-Type": "application/json"
+                                    });
+                                    response.end(res);
                                 });
-                                response.writeHead(201, {
-                                    "Access-Control-Allow-Origin": "*",
-                                    "Content-Type": "application/json"
-                                });
-                                response.end(res);
                             }
                         } else {
                             response.writeHead(400, {
@@ -270,15 +289,52 @@ function requestListener(request, response) {
                             }
                             $("#ogIUrl").attr("content", config.host + "/" + path[1]);
                             $("#ogUrl").attr("content", config.host + "/view/" + path[1]);
-                            $(".name").text(config.serverName);
-                            $("img").attr("src", "/" + path[1]);
-                            var nt = $("title").text().toString().replace("$serverName", config.serverName);
-                            $("title").text(nt);
-                            response.writeHead(200, {
-                                "Access-Control-Allow-Origin": "*",
-                                "Content-Type": "text/html"
-                            });
-                            response.end($.html());
+                            if (!j.width || !j.height) {
+                                Jimp.read(__dirname + "/files/" + path[1] + "." + whatType(path[1])).then(function(f) {
+                                    var w = f.bitmap.width;
+                                    var h = f.bitmap.height;
+                                    j.width = w;
+                                    j.height = h;
+                                    fs.writeFileSync(__dirname + "/files/meta/" + path[1] + ".json", JSON.stringify(j));
+                                    $("#ogWidth").attr("content", w);
+                                    $("#ogHeight").attr("content", h);
+                                    $(".name").text(config.serverName);
+                                    $("img").attr("src", "/" + path[1]);
+                                    var nt = $("title").text().toString().replace("$serverName", config.serverName);
+                                    $("title").text(nt);
+                                    response.writeHead(200, {
+                                        "Access-Control-Allow-Origin": "*",
+                                        "Content-Type": "text/html"
+                                    });
+                                    response.end($.html());
+                                }).catch(function(err) {
+                                    console.log(err);
+                                    $("#ogWidth").remove();
+                                    $("#ogHeight").remove();
+                                    $(".name").text(config.serverName);
+                                    $("img").attr("src", "/" + path[1]);
+                                    var nt = $("title").text().toString().replace("$serverName", config.serverName);
+                                    $("title").text(nt);
+                                    response.writeHead(200, {
+                                        "Access-Control-Allow-Origin": "*",
+                                        "Content-Type": "text/html"
+                                    });
+                                    response.end($.html());
+                                });
+                            } else {
+                                $("#ogWidth").attr("content", j.width);
+                                $("#ogHeight").attr("content", j.height);
+                                $(".name").text(config.serverName);
+                                $("img").attr("src", "/" + path[1]);
+                                var nt = $("title").text().toString().replace("$serverName", config.serverName);
+                                $("title").text(nt);
+                                response.writeHead(200, {
+                                    "Access-Control-Allow-Origin": "*",
+                                    "Content-Type": "text/html"
+                                });
+                                response.end($.html());
+                            }
+                           
                         }
                     })
                 } else {
