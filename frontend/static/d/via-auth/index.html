@@ -19,17 +19,13 @@
             </div>
         </div>
         <div class="body">
-            <noscript>
-                <p>It seems you don't have Javascript enabled - but don't fret, you can easily complete removal without it!</p>
-                <p>Just go into the search bar and type <span class="host"></span>/delete/<code>[deletion key]</code>.</p>
-                <p>For example, if your deletion key is <code>9PTT2k8hvaX5AYpYsLAx</code> - you would go to <span class="host"></span>/delete/<code>9PTT2k8hvaX5AYpYsLAx</code>.</p>
-                <p>If after you enter this, the text on screen says <code>{"success":true}</code> or something similar, the task succeeded and your image was removed.</p>
-            </noscript>
             <div id="scriptReq" style="display:none;">
-                <input autofocus="" placeholder="Insert deletion key here." id="dk" style="width:50%;">
+                <label for="id">ID of Image:</label>
+                <input autofocus="" placeholder="Insert image ID here." id="iid" name="id" style="width:50%;"><br>
+                <label for="auth">Authentication key of uploader:</label>
+                <input autofocus="" placeholder="Insert auth key here." id="auth" name="auth" type="password" style="width:50%;"><br>
                 <button onclick="del();">Remove!</button>
                 <p>Don't have the delete key or would like to report something? Contact the server's maintainer.</p>
-                <p>You can also delete via <a href="via-auth/">via your authentication key</a>, if you have that handy.</p>
                 <p id="prog"></p>
                 <div id="success" style="display:none;">
                     <p>Deleted!</p>
@@ -39,6 +35,6 @@
                 </div>
             </div>
         </div>
-        <script src="/d/index.js"></script>
+        <script src="/d/via-auth/index.js"></script>
     </body>
 </html>

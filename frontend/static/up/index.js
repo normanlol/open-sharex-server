@@ -27,6 +27,17 @@ function upload() {
             document.getElementById("link").href = "/" + j.id;
             document.getElementById("htmlLink").href = "/view/" + j.id
             document.getElementById("delLink").href = "/d/?code=" + j.deleteKey;
+            if (localStorage.getItem("dk-mini-db")) {
+                var db = JSON.parse(localStorage.getItem("dk-mini-db"));
+                db.push({"id": j.id, "dk": j.deleteKey});
+                db = JSON.stringify(db);
+                localStorage.setItem("dk-mini-db", db);
+            } else {
+                var db = [];
+                db.push({"id": j.id, "dk": j.deleteKey});
+                db = JSON.stringify(db);
+                localStorage.setItem("dk-mini-db", db);
+            }
             if (document.getElementById("auth")) {localStorage.setItem("auth", document.getElementById("auth").value);}
         } else {
             document.getElementById("progDiv").style.display = "none";

@@ -193,19 +193,34 @@ function requestListener(request, response) {
         return;
 
         case "delete":
-            if (whatDk(path[1]) !== null) {
-                var t = "." + whatType(whatDk(path[1]));
-                if (fs.existsSync(__dirname + "/files/" + whatDk(path[1]) + t)) {
-                    fs.unlinkSync(__dirname + "/files/" + whatDk(path[1]) + t);
-                    fs.unlinkSync(__dirname + "/files/meta/" + whatDk(path[1]) + ".json");
-                    response.writeHead(200, {
-                        "Access-Control-Allow-Origin": "*",
-                        "Content-Type": "application/json"
-                    });
-                    var res = JSON.stringify({
-                        "success": true
-                    });
-                    response.end(res)
+            if (u.query.method == "deleteKey" || !u.query.method) {
+                if (whatDk(path[1]) !== null) {
+                    var t = "." + whatType(whatDk(path[1]));
+                    if (fs.existsSync(__dirname + "/files/" + whatDk(path[1]) + t)) {
+                        fs.unlinkSync(__dirname + "/files/" + whatDk(path[1]) + t);
+                        fs.unlinkSync(__dirname + "/files/meta/" + whatDk(path[1]) + ".json");
+                        if (fs.existsSync(__dirname + "/files/thumbs/" + whatDk(path[1]) + ".jpg")) {fs.unlinkSync(__dirname + "/files/thumbs/" + whatDk(path[1]) + ".jpg");}
+                        response.writeHead(200, {
+                            "Access-Control-Allow-Origin": "*",
+                            "Content-Type": "application/json"
+                        });
+                        var res = JSON.stringify({
+                            "success": true
+                        });
+                        response.end(res);
+                    } else {
+                        response.writeHead(400, {
+                            "Access-Control-Allow-Origin": "*",
+                            "Content-Type": "application/json"
+                        });
+                        response.end(JSON.stringify({
+                            "success": false,
+                            "err": {
+                                "code": "alreadyDeleted",
+                                "message": "This photo has already been deleted."
+                            }
+                        }));
+                    }
                 } else {
                     response.writeHead(400, {
                         "Access-Control-Allow-Origin": "*",
@@ -214,8 +229,50 @@ function requestListener(request, response) {
                     response.end(JSON.stringify({
                         "success": false,
                         "err": {
-                            "code": "alreadyDeleted",
-                            "message": "This photo has already been deleted."
+                            "code": "invalidDeleteKey",
+                            "message": "Could not find your delete key."
+                        }
+                    }));
+                }
+            } else if (u.query.method == "authKey") {
+                if (whatType(u.query.id) !== null && whoIs(u.query.auth) !== null) {
+                    var j = JSON.parse(fs.readFileSync(__dirname + "/files/meta/" + u.query.id + ".json"));
+                    var t = "." + whatType(u.query.id);
+                    if (j.uploaderKey == u.query.auth) {
+                        fs.unlinkSync(__dirname + "/files/" + u.query.id + t);
+                        fs.unlinkSync(__dirname + "/files/meta/" + u.query.id + ".json");
+                        if (fs.existsSync(__dirname + "/files/thumbs/" + u.query.id + ".jpg")) {fs.unlinkSync(__dirname + "/files/thumbs/" + u.query.id + ".jpg");}
+                        response.writeHead(200, {
+                            "Access-Control-Allow-Origin": "*",
+                            "Content-Type": "application/json"
+                        });
+                        var res = JSON.stringify({
+                            "success": true
+                        });
+                        response.end(res);
+                    } else {
+                        response.writeHead(400, {
+                            "Access-Control-Allow-Origin": "*",
+                            "Content-Type": "application/json"
+                        });
+                        response.end(JSON.stringify({
+                            "success": false,
+                            "err": {
+                                "code": "invalidKey",
+                                "message": "The image exists but you didn't use the same authentication key as the uploader."
+                            }
+                        }));
+                    }
+                } else {
+                    response.writeHead(400, {
+                        "Access-Control-Allow-Origin": "*",
+                        "Content-Type": "application/json"
+                    });
+                    response.end(JSON.stringify({
+                        "success": false,
+                        "err": {
+                            "code": "invalidParams",
+                            "message": "Invalid parameters, this requires a valid ID and authentication key."
                         }
                     }));
                 }
@@ -227,72 +284,47 @@ function requestListener(request, response) {
                 response.end(JSON.stringify({
                     "success": false,
                     "err": {
-                        "code": "invalidDeleteKey",
-                        "message": "Could not find your delete key."
+                        "code": "invalidDeleteMethod",
+                        "message": "Invalid method of removing image."
                     }
                 }));
             }
         return;
 
         case "view":
-                if (whatType(path[1]) !== null) {
-                    fs.readFile(__dirname + "/frontend/dynamic/view/index.html", function(err, resp) {
-                        if (err) {
-                            handleError(err, request, response);
+            if (whatType(path[1]) !== null) {
+                fs.readFile(__dirname + "/frontend/dynamic/view/index.html", function(err, resp) {
+                    if (err) {
+                        handleError(err, request, response);
+                    } else {
+                        var $ = cheerio.load(resp);
+                        var j = JSON.parse(fs.readFileSync(__dirname + "/files/meta/" + path[1] + ".json"));
+                        if (j.uploader == null) {
+                            $("#upContainer").remove();
+                            $(".ogTitle").attr("content", "Image uploaded by Anonymous");
                         } else {
-                            var $ = cheerio.load(resp);
-                            var j = JSON.parse(fs.readFileSync(__dirname + "/files/meta/" + path[1] + ".json"));
-                            if (j.uploader == null) {
-                                $("#upContainer").remove();
-                                $(".ogTitle").attr("content", "Image uploaded by Anonymous");
-                            } else {
-                                $("#uploader").text(j.uploader);
-                                $(".ogTitle").attr("content", "Image uploaded by " + j.uploader);
-                            }
-                            if (j.uploadedAt == null) {
-                                $("#dateContainer").remove();
-                                $(".ogDesc").attr("content", "Uploaded at an unknown time");
-                            } else {
-                                $("#date").text(new Date(j.uploadedAt).toString());
-                                $(".ogDesc").attr("content", "Uploaded at " + new Date(j.uploadedAt).toString());
-                            }
-                            $(".ogIUrl").attr("content", config.host + "/" + path[1]);
-                            $(".ogUrl").attr("content", config.host + "/view/" + path[1]);
-                            if (!j.width || !j.height) {
-                                Jimp.read(__dirname + "/files/" + path[1] + "." + whatType(path[1])).then(function(f) {
-                                    var w = f.bitmap.width;
-                                    var h = f.bitmap.height;
-                                    j.width = w;
-                                    j.height = h;
-                                    fs.writeFileSync(__dirname + "/files/meta/" + path[1] + ".json", JSON.stringify(j));
-                                    $(".ogWidth").attr("content", w);
-                                    $(".ogHeight").attr("content", h);
-                                    $(".name").text(config.serverName);
-                                    $("img").attr("src", "/" + path[1]);
-                                    var nt = $("title").text().toString().replace("$serverName", config.serverName);
-                                    $("title").text(nt);
-                                    response.writeHead(200, {
-                                        "Access-Control-Allow-Origin": "*",
-                                        "Content-Type": "text/html"
-                                    });
-                                    response.end($.html());
-                                }).catch(function(err) {
-                                    console.log(err);
-                                    $(".ogWidth").remove();
-                                    $(".ogHeight").remove();
-                                    $(".name").text(config.serverName);
-                                    $("img").attr("src", "/" + path[1]);
-                                    var nt = $("title").text().toString().replace("$serverName", config.serverName);
-                                    $("title").text(nt);
-                                    response.writeHead(200, {
-                                        "Access-Control-Allow-Origin": "*",
-                                        "Content-Type": "text/html"
-                                    });
-                                    response.end($.html());
-                                });
-                            } else {
-                                $(".ogWidth").attr("content", j.width);
-                                $(".ogHeight").attr("content", j.height);
+                            $("#uploader").text(j.uploader);
+                            $(".ogTitle").attr("content", "Image uploaded by " + j.uploader);
+                        }
+                        if (j.uploadedAt == null) {
+                            $("#dateContainer").remove();
+                            $(".ogDesc").attr("content", "Uploaded at an unknown time");
+                        } else {
+                            $("#date").text(new Date(j.uploadedAt).toString());
+                            $(".ogDesc").attr("content", "Uploaded at " + new Date(j.uploadedAt).toString());
+                        }
+                        $(".ogIUrl").attr("content", config.host + "/" + path[1]);
+                        $(".ogUrl").attr("content", config.host + "/view/" + path[1]);
+                        $("#direct").attr("href", "/" + path[1]);
+                        if (!j.width || !j.height) {
+                            Jimp.read(__dirname + "/files/" + path[1] + "." + whatType(path[1])).then(function(f) {
+                            var w = f.bitmap.width;
+                            var h = f.bitmap.height;
+                                j.width = w;
+                                j.height = h;
+                                fs.writeFileSync(__dirname + "/files/meta/" + path[1] + ".json", JSON.stringify(j));
+                                $(".ogWidth").attr("content", w);
+                                $(".ogHeight").attr("content", h);
                                 $(".name").text(config.serverName);
                                 $("img").attr("src", "/" + path[1]);
                                 var nt = $("title").text().toString().replace("$serverName", config.serverName);
@@ -302,13 +334,38 @@ function requestListener(request, response) {
                                     "Content-Type": "text/html"
                                 });
                                 response.end($.html());
-                            }
-                           
+                            }).catch(function(err) {
+                                console.log(err);
+                                $(".ogWidth").remove();
+                                $(".ogHeight").remove();
+                                $(".name").text(config.serverName);
+                                $("img").attr("src", "/" + path[1]);
+                                var nt = $("title").text().toString().replace("$serverName", config.serverName);
+                                $("title").text(nt);
+                                response.writeHead(200, {
+                                    "Access-Control-Allow-Origin": "*",
+                                    "Content-Type": "text/html"
+                                });
+                                response.end($.html());
+                            });
+                        } else {
+                            $(".ogWidth").attr("content", j.width);
+                            $(".ogHeight").attr("content", j.height);
+                            $(".name").text(config.serverName);
+                            $("img").attr("src", "/" + path[1]);
+                            var nt = $("title").text().toString().replace("$serverName", config.serverName);
+                            $("title").text(nt);
+                            response.writeHead(200, {
+                                "Access-Control-Allow-Origin": "*",
+                                "Content-Type": "text/html"
+                            });
+                            response.end($.html());
                         }
-                    })
-                } else {
-                    handleError("404", request, response);
-                }
+                    }
+                })
+            } else {
+                handleError("404", request, response);
+            }
         return;
 
         case "gen":

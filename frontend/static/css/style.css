@@ -18,6 +18,7 @@ body {
 
 .imgContainer img {
     max-width:fit-content;
+    max-height:60vh;
 }
 
 button,
@@ -72,6 +73,16 @@ code, .code {
 
 .body a, body a:visited {
     color:#b8c1ec;
+}
+
+.viewerCont, .viewerCont h2 {
+    width:100%;
+    margin-top:7.5px;
+}
+
+.viewerCont h2 {
+    height:28px !important;
+    margin:0;
 }
 
 @media (min-width:850px) {
@@ -134,6 +145,10 @@ code, .code {
 #auth {
     max-width:550px;
     width:50%;
+}
+
+.btn {
+    width:100%;
 }
 
 @media (min-width:800px) {
