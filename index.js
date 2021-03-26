@@ -216,7 +216,7 @@ function requestListener(request, response) {
         return;
 
         case "view":
-            if (returnRaw(request.headers["user-agent"]) || request.headers.accept.startsWith("image/")) {
+            if (returnRaw(request.headers["user-agent"]) || request.headers.accept !== undefined && request.headers.accept.startsWith("image/")) {
                 if (
                     whatType(u.pathname.substring(1)) !== null
                 ) {
