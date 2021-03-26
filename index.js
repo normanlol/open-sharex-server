@@ -822,8 +822,12 @@ function handleError(error, request, response) {
 }
 
 function returnRaw(ua) {
-    if (ua.includes("Discord") || ua.includes("Googlebot") || ua.includes("Discord") || ua.includes("BingPreviews")) {
-        return true;
+    if (ua) {
+        if (ua.includes("Discord") || ua.includes("Googlebot") || ua.includes("Discord") || ua.includes("BingPreviews")) {
+            return true;
+        } else {
+            return false;
+        }
     } else {
         return false;
     }
