@@ -15,6 +15,7 @@ In no particular order, here are the things I *want* to add at some point.
 - Better server-side configuration
 - Expiring images (user OR server-set)
 - Something similar to the likes of [this thing](https://img.hazy.su/)
+- Add OCR (image "reading") to transcribe images
 
 ## credits
 
