@@ -235,37 +235,6 @@ function requestListener(request, response) {
         return;
 
         case "view":
-            if (returnRaw(request.headers["user-agent"]) || request.headers.accept !== undefined && request.headers.accept.startsWith("image/")) {
-                if (
-                    whatType(u.pathname.substring(1)) !== null
-                ) {
-                    fs.readFile(__dirname + "/files" + u.pathname + "." + whatType(u.pathname.substring(1)), function(err, resp) {
-                        if (err) {
-                            handleError(err, request, response);
-                        } else {
-                            response.writeHead(200, {
-                                "Access-Control-Allow-Origin": "*",
-                                "Content-Type": "image/" + whatType(u.pathname.substring(1))
-                            });
-                            response.end(resp);
-                        }
-                    })
-                } else if (
-                    whatType(u.pathname.substring(1).split(".")[0]) !== null
-                ) {
-                    fs.readFile(__dirname + "/files" + u.pathname, function(err, resp) {
-                        if (err) {
-                            handleError(err, request, response);
-                        } else {
-                            response.writeHead(200, {
-                                "Access-Control-Allow-Origin": "*",
-                                "Content-Type": "image/" + whatType(u.pathname.substring(1))
-                            });
-                            response.end(resp);
-                        }
-                    });
-                } 
-            } else {
                 if (whatType(path[1]) !== null) {
                     fs.readFile(__dirname + "/frontend/dynamic/view/index.html", function(err, resp) {
                         if (err) {
@@ -341,8 +310,6 @@ function requestListener(request, response) {
                 } else {
                     handleError("404", request, response);
                 }
-            }
-            
         return;
 
         case "gen":
