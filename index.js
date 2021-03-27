@@ -379,7 +379,7 @@ function requestListener(request, response) {
                         "Body": "MultipartFormData",
                         "FileFormName": "file",
                         "URL": config.host + "/$json:id$",
-                        "DeletionURL": config.host + "/delete/$json:deleteKey$"
+                        "DeletionURL": config.host + "/d/?code=$json:deleteKey$"
                     });
                     response.writeHead(201, {
                         "Access-Control-Allow-Origin":"*",
@@ -399,7 +399,7 @@ function requestListener(request, response) {
                         "Body": "MultipartFormData",
                         "FileFormName": "file",
                         "URL": config.host + "/$json:id$",
-                        "DeletionURL": config.host + "/delete/$json:deleteKey$"
+                        "DeletionURL": config.host + "/d/?code=$json:deleteKey$"
                     });
                     response.writeHead(201, {
                         "Access-Control-Allow-Origin":"*",
@@ -422,7 +422,7 @@ function requestListener(request, response) {
                                 "Body": "MultipartFormData",
                                 "FileFormName": "file",
                                 "URL": config.host + "/$json:id$",
-                                "DeletionURL": config.host + "/delete/$json:deleteKey$"
+                                "DeletionURL": config.host + "/d/?code=$json:deleteKey$"
                             });
                             response.writeHead(201, {
                                 "Access-Control-Allow-Origin":"*",
