@@ -48,10 +48,10 @@ function upload() {
         }
     } else if (document.getElementById("url").value !== "") {
         xhr.open("GET", "/upload?url=" + btoa(document.getElementById("url").value));
-        xhr.send();
         if (document.getElementById("auth")) {
             xhr.setRequestHeader("authentication", document.getElementById("auth").value);
         }
+        xhr.send();
         document.getElementById("prog").innerHTML = "Downloading to the server...";
         xhr.onload = function () {
             document.getElementById("prog").innerHTML = "Finalizing...";
