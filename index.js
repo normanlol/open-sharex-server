@@ -3,8 +3,8 @@ const http = require("http");
 const formidable = require("formidable");
 const cheerio = require("cheerio");
 const url = require("url");
+const got = require("got");
 const jimp = require("jimp");
-const Jimp = require("jimp");
 
 if (!fs.existsSync(__dirname + "/config.json")) {
     fs.copyFileSync(__dirname + "/config.example.json", __dirname + "/config.json");
@@ -158,6 +158,123 @@ function requestListener(request, response) {
                         }
                     }
                 });
+            } else if (request.method.toLowerCase() == "get" && u.query.url) {
+                var ru = url.parse(atob(u.query.url), true);
+                got(atob(u.query.url), {
+                    headers: {
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0",
+                        "Accept": "image/webp,*/*",
+                        "Accept-Language": "en-US,en;q=0.5",
+                        "Accept-Encoding": "gzip, deflate, br",
+                        "Referer": ru.protocol + "//" + ru.host
+                    }
+                }).then(function(resp) {
+                    if (
+                        resp.headers["content-type"] == "image/png" ||
+                        resp.headers["content-type"] == "image/jpg" || 
+                        resp.headers["content-type"] == "image/jpeg" ||
+                        resp.headers["content-type"] == "image/gif"
+                    ) {
+                        if (config.requireAuth == true) {  
+                            if (request.headers["authentication"]) {
+                                if (!validAuth(request.headers["authentication"])) {
+                                    response.writeHead(403, {
+                                        "Access-Control-Allow-Origin": "*",
+                                        "Content-Type": "application/json"
+                                    });
+                                    response.end(JSON.stringify({
+                                        "success": false,
+                                        "err": {
+                                            "code": "needAuth",
+                                            "message": "You must have a valid authentication token."
+                                        }
+                                    }));
+                                    return;
+                                }
+                            } else {
+                                response.writeHead(403, {
+                                    "Access-Control-Allow-Origin": "*",
+                                    "Content-Type": "application/json"
+                                });
+                                response.end(JSON.stringify({
+                                    "success": false,
+                                    "err": {
+                                        "code": "needAuth",
+                                        "message": "You must have an authentication token."
+                                    }
+                                }));
+                                return;
+                            }
+                        }
+                        var id = createId();
+                        var dk = deleteKey(id);
+                        var fn = __dirname + "/files/" + id + "." + t;
+                        var mdfn = __dirname + "/files/meta/" + id + ".json";
+                        if (!fs.existsSync(__dirname + "/files/")) {fs.mkdirSync(__dirname + "/files/")}
+                        if (!fs.existsSync(__dirname + "/files/meta/")) {fs.mkdirSync(__dirname + "/files/meta/")}
+                        fs.writeFileSync(fn, resp.rawBody);
+                        jimp.read(fn).then(function(f) {
+                            var h = f.bitmap.height;
+                            var w = f.bitmap.width;
+                            if (request.headers["authentication"]) {
+                                var md = JSON.stringify({
+                                    "uploader": escapeHtml(whoIs(request.headers["authentication"])),
+                                    "uploaderKey": request.headers["authentication"],
+                                    "uploadedAt": new Date() * 1,
+                                    "deleteKey": dk,
+                                    "width": w,
+                                    "height": h
+                                });
+                            } else {
+                                var md = JSON.stringify({
+                                    "uploader": "Anonymous",
+                                    "uploaderKey": null,
+                                    "uploadedAt": new Date() * 1,
+                                    "deleteKey": dk,
+                                    "width": w,
+                                    "height": h
+                                });
+                            }
+                            fs.writeFileSync(mdfn, md);
+                            var res = JSON.stringify({
+                                "success": true,
+                                "id": id,
+                                "deleteKey": dk
+                            });
+                            response.writeHead(201, {
+                                "Access-Control-Allow-Origin": "*",
+                                "Content-Type": "application/json"
+                            });
+                            response.end(res);
+                        });
+                    } else {
+                        var res = JSON.stringify({
+                            "success": false,
+                            "err": {
+                                "message": "Could not retrieve valid content.",
+                                "code": "invalidContent"
+                            }
+                        });
+                        response.writeHead(500, {
+                            "Access-Control-Allow-Origin": "*",
+                            "Content-Type": "application/json"
+                        });
+                        response.end(res);
+                    }
+                }).catch(function(err) {
+                    var res = JSON.stringify({
+                        "success": false,
+                        "err": {
+                            "message": err.message,
+                            "code": err.code
+                        }
+                    });
+                    response.writeHead(500, {
+                        "Access-Control-Allow-Origin": "*",
+                        "Content-Type": "application/json"
+                    });
+                    response.end(res);
+                })
             } else {
                 response.writeHead(403, {
                     "Access-Control-Allow-Origin": "*",
@@ -317,9 +434,9 @@ function requestListener(request, response) {
                         $(".ogUrl").attr("content", config.host + "/view/" + path[1]);
                         $("#direct").attr("href", "/" + path[1]);
                         if (!j.width || !j.height) {
-                            Jimp.read(__dirname + "/files/" + path[1] + "." + whatType(path[1])).then(function(f) {
-                            var w = f.bitmap.width;
-                            var h = f.bitmap.height;
+                            jimp.read(__dirname + "/files/" + path[1] + "." + whatType(path[1])).then(function(f) {
+                                var w = f.bitmap.width;
+                                var h = f.bitmap.height;
                                 j.width = w;
                                 j.height = h;
                                 fs.writeFileSync(__dirname + "/files/meta/" + path[1] + ".json", JSON.stringify(j));
@@ -738,6 +855,7 @@ function deleteKey(id) {
     for (var c = 0; c < 20; c++) {
         result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
+    if (!fs.existsSync(__dirname + "/keys/")) {fs.mkdirSync(__dirname + "/keys/")}
     if (fs.existsSync(__dirname + "/keys/delete-db.json")) {
         var c = JSON.parse(fs.readFileSync(__dirname + "/keys/delete-db.json"));
         c.push({
@@ -922,3 +1040,11 @@ function escapeHtml(unsafe) {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
  }
+
+function btoa(a) {
+    return Buffer.from(a, "ascii").toString("base64");
+}
+
+function atob(a) {
+    return Buffer.from(a, "base64").toString();
+}

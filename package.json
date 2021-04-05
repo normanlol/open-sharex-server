@@ -23,6 +23,7 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.5",
     "formidable": "^1.2.2",
+    "got": "^11.8.2",
     "jimp": "^0.16.1"
   }
 }
