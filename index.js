@@ -6,6 +6,8 @@ const url = require("url");
 const got = require("got");
 const jimp = require("jimp");
 
+//fixUnd("4plBuoUKR0")
+
 if (!fs.existsSync(__dirname + "/config.json")) {
     fs.copyFileSync(__dirname + "/config.example.json", __dirname + "/config.json");
 }
@@ -410,6 +412,7 @@ function requestListener(request, response) {
 
         case "view":
             if (whatType(path[1]) !== null) {
+                if (whatType(path[1]) == "undefined" || whatType(path[1]) == undefined) {fixUnd(path[1])}
                 fs.readFile(__dirname + "/frontend/dynamic/view/index.html", function(err, resp) {
                     if (err) {
                         handleError(err, request, response);
@@ -770,6 +773,7 @@ function requestListener(request, response) {
             } else if (
                 whatType(u.pathname.substring(1)) !== null
             ) {
+                if (whatType(u.pathname.substring(1)) == "undefined" || whatType(u.pathname.substring(1)) == undefined) {fixUnd(u.pathname.substring(1));}
                 fs.readFile(__dirname + "/files" + u.pathname + "." + whatType(u.pathname.substring(1)), function(err, resp) {
                     if (err) {
                         handleError(err, request, response);
@@ -820,6 +824,13 @@ function whatType(id) {
         }
         return null;
     }
+}
+
+function fixUnd(f) {
+    jimp.read(__dirname + "/files/" + f + ".undefined").then(function(e) {
+        var t = e.getMIME().split("/")[e.getMIME().split("/").length - 1];
+        fs.renameSync(__dirname + "/files/" + f + ".undefined", __dirname + "/files/" + f + "." + t);
+    })
 }
 
 function getAuth(n) {
